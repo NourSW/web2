@@ -6,14 +6,15 @@ var logger = require('morgan');
 var pizzaRouter = require('./routes/pizzas');
 var usersRouter = require('./routes/users');
 
+
 var app = express();
-let nmbrReq = 0;
 
 app.use((req, res, next) => {
     console.log('Time:', Date.now());
-    console.log('nmbr req : ' ,nmbrReq);
+    console.log(req.method.path)
+
     next();
-    nmbrReq++;
+    
   });
 
 app.use(logger('dev'));
