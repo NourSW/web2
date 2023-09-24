@@ -3,7 +3,7 @@ POST http://localhost:3000/films
 Content-Type: application/json
 
 {
-    "title": "GOKU 4",
+    "title": "VEGETA 4",
     "duration": 240,
     "budget": 400,
     "link": "https://www.google.com/search?q=vegeta&rlz=1C1SQJL_frTN932BE935&oq=vegeta&aqs=chrome..69i57j69i64j0i67i650j0i67i131i433i650j0i433i512l2j0i512j46i175i199i512.1752j0j15&sourceid=chrome&ie=UTF-8"
@@ -15,3 +15,31 @@ GET http://localhost:3000/films
 ### Read all pizzas with File variable
 @baseUrl = http://localhost:3000
 GET {{baseUrl}}/films
+
+### Delete pizza identified by 2
+DELETE {{baseUrl}}/films/2
+
+### Update the pizza identified by 6
+PATCH {{baseUrl}}/films/3
+Content-Type: application/json
+
+{
+    "title":"moha",
+    "duration":"5826985"
+}
+
+
+### Update the pizza identified
+PUT {{baseUrl}}/films/100
+Content-Type: application/json
+
+{
+    "title":"SUUU",
+    "duration":0,
+    "link":"oui",
+    "budget":0
+}
+
+
+
+
