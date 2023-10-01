@@ -17,7 +17,7 @@ GET http://localhost:3000/films
 GET {{baseUrl}}/films
 
 ### Delete pizza identified by 2
-DELETE {{baseUrl}}/films/2
+DELETE {{baseUrl}}/films/4
 
 ### Update the pizza identified by 6
 PATCH {{baseUrl}}/films/3

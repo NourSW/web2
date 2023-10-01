@@ -1,5 +1,9 @@
 var express = require('express');
+const { serialize, parse } = require('../utils/json');
 var router = express.Router();
+
+const jsonDbPath = __dirname + '/../data/films.json';
+
 
 const FILMS = [
   {
@@ -32,14 +36,17 @@ const FILMS = [
    GET /pizzas?order=-title : descending order by title
 */
 router.get('/', (req, res, next) => {
-  const minimumFilmDuration = req?.query
+
+const films = parse(jsonDbPath, FILMS);
+
+const minimumFilmDuration = req?.query
   ? Number(req.query['minimum-duration'])
   : undefined;
 if (typeof minimumFilmDuration !== 'number' || minimumFilmDuration <= 0)
 return res.sendStatus(400);
-if (!minimumFilmDuration) return res.json(FILMS);
+if (!minimumFilmDuration) return res.json(films);
 
-const filmsReachingMinimumDuration = FILMS.filter(
+const filmsReachingMinimumDuration = films.filter(
   (film) => film.duration >= minimumFilmDuration
 );
 return res.json(filmsReachingMinimumDuration);
@@ -51,12 +58,16 @@ return res.json(filmsReachingMinimumDuration);
 router.get('/:id', (req, res) => {
   console.log(`GET /pizzas/${req.params.id}`);
 
-  const indexOfPizzaFound = FILMS.findIndex((pizza) => pizza.id == req.params.id);
+  const films = parse(jsonDbPath, FILMS);
+
+
+  const indexOfPizzaFound = films.findIndex((pizza) => pizza.id == req.params.id);
 
   if (indexOfPizzaFound < 0) return res.sendStatus(404);
 
-  res.json(FILMS[indexOfPizzaFound]);
+  return res.json(films[indexOfPizzaFound]);
 });
+
 
 // Create a pizza to be added to the menu.
 router.post('/', (req, res) => {
@@ -77,11 +88,16 @@ router.post('/', (req, res) => {
 
   if (!title || !duration || !budget || !link) return res.sendStatus(400); // error code '400 Bad request'
 
-  const existingFilm = FILMS.find((film) => film.title.toLowerCase() === title.toLowerCase())
+
+  const films = parse(jsonDbPath, FILMS);
+
+
+  const existingFilm = films.find((film) => film.title.toLowerCase() === title.toLowerCase())
   if(existingFilm)return res.sendStatus(409);
   
-  const lastItemIndex = FILMS?.length !== 0 ? FILMS.length - 1 : undefined;
-  const lastId = lastItemIndex !== undefined ? FILMS[lastItemIndex]?.id : 0;
+
+  const lastItemIndex = films?.length !== 0 ? films.length - 1 : undefined;
+  const lastId = lastItemIndex !== undefined ? films[lastItemIndex]?.id : 0;
   const nextId = lastId + 1;
 
   
@@ -93,23 +109,29 @@ router.post('/', (req, res) => {
     link: link
   };
 
-  FILMS.push(newFilm);
+  films.push(newFilm);
 
-  res.json(newFilm);
+  serialize(jsonDbPath, films)
+
+  return res.json(newFilm);
 });
 
 // Delete a pizza from the menu based on its id
 router.delete('/:id', (req, res) => {
   console.log(`DELETE /pizzas/${req.params.id}`);
 
-  const foundIndex = FILMS.findIndex(pizza => pizza.id == req.params.id);
+  const films = parse(jsonDbPath, FILMS);
+
+  const foundIndex = films.findIndex(pizza => pizza.id == req.params.id);
 
   if (foundIndex < 0) return res.sendStatus(404);
 
-  const itemsRemovedFromMenu = FILMS.splice(foundIndex, 1);
+  const itemsRemovedFromMenu = films.splice(foundIndex, 1);
   const itemRemoved = itemsRemovedFromMenu[0];
 
-  res.json(itemRemoved);
+  serialize(jsonDbPath, films)
+
+  return res.json(itemRemoved);
 });
 
 // Update a pizza based on its id and new values for its parameters
@@ -123,20 +145,27 @@ router.patch('/:id', (req, res) => {
 
   if ((!title || !content) || title?.length === 0 || content?.length === 0) return res.sendStatus(400);
 
-  const foundIndex = FILMS.findIndex(pizza => pizza.id == req.params.id);
+  const films = parse(jsonDbPath, FILMS);
+  
+  const foundIndex = films.findIndex(pizza => pizza.id == req.params.id);
 
   if (foundIndex < 0) return res.sendStatus(404);
 
-  const updatedPizza = {...FILMS[foundIndex], ...req.body};
+  const updatedPizza = {...films[foundIndex], ...req.body};
 
-  FILMS[foundIndex] = updatedPizza;
+  films[foundIndex] = updatedPizza;
 
-  res.json(updatedPizza);
+  serialize(jsonDbPath, films)
+
+  return res.json(updatedPizza);
 });
 
 // Update a pizza based on its id and new values for its parameters
 router.put('/:id', (req, res) => {
   console.log(`Put /pizzas/${req.params.id}`);
+
+  const films = parse(jsonDbPath, FILMS);
+
 
   const title = req?.body?.title;
   const link = req?.body?.link; // ?? IL NYA RIEN DS LE CONTENT PK CA RETOURNE PAS UNE ERR RES.STATU400 ??
@@ -160,20 +189,22 @@ router.put('/:id', (req, res) => {
   )return res.sendStatus(400);
 
   const id = req.params.id;
-  const foundIndex = FILMS.findIndex(pizza => pizza.id == id);
+  const foundIndex = films.findIndex(pizza => pizza.id == id);
 
   if (foundIndex < 0){
     const newFilm = {id,title,link,duration,budget};
-    FILMS.push(newFilm);
+    films.push(newFilm);
     return res.json(newFilm); 
 
   } 
 
-  const updatedPizza = {...FILMS[foundIndex], ...req.body};
+  const updatedPizza = {...films[foundIndex], ...req.body};
 
-  FILMS[foundIndex] = updatedPizza;
+  films[foundIndex] = updatedPizza;
 
-  res.json(updatedPizza);
+  serialize(jsonDbPath, films)
+
+  return res.json(updatedPizza);
 });
 
 
