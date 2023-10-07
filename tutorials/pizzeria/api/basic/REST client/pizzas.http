@@ -13,3 +13,15 @@ GET http://localhost:3000/pizzas
 ### Read all pizzas with File variable
 @baseUrl = http://localhost:3000
 GET {{baseUrl}}/pizzas
+
+### Delete pizza identified by 2
+DELETE {{baseUrl}}/pizzas/2
+
+### Update the pizza identified by 6
+PATCH {{baseUrl}}/pizzas/6
+Content-Type: application/json
+
+{
+    "title":"Magic Green 2"
+}
+
